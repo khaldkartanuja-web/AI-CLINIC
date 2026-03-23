@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartClinic - Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation -->
+        <nav class="top-nav">
+            <div class="logo">
+                <span class="icon">🏥</span>
+                <span class="text" id="app-title">Staff Connect</span>
+            </div>
+            <div class="nav-actions">
+                <select id="lang-select" class="lang-switcher">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+                <a href="index.html" class="nav-btn" id="nav-back">&larr; Back to Patient Chat</a>
+            </div>
+        </nav>
+
+        <!-- Main Layout -->
+        <main class="glass-panel admin-layout">
+            <!-- Sidebar for Filters -->
+            <aside class="sidebar">
+                <div class="search-box">
+                    <input type="text" id="db-search" placeholder="Search records...">
+                </div>
+                
+                <h3 id="sidebar-title" style="margin-bottom: 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Records</h3>
+                
+                <button class="filter-btn active" data-filter="dashboard" id="filter-dashboard">📊 Dashboard</button>
+                <button class="filter-btn" data-filter="patients" id="filter-patients">👤 Patients</button>
+                <button class="filter-btn" data-filter="appointments" id="filter-appointments">📅 Appointments</button>
+                <button class="filter-btn" data-filter="doctors" id="filter-doctors">🩺 Doctors</button>
+                <button class="filter-btn" data-filter="callLogs" id="filter-calllogs">📞 Call Logs</button>
+            </aside>
+
+            <!-- Data Area -->
+            <section class="data-view">
+                <div class="section-header">
+                    <h2 id="view-title">Dashboard Summary</h2>
+                </div>
+                <div id="data-container">
+                    <!-- Dashboard or Cards will be injected here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        // Language Switch Logic
+        const langSelect = document.getElementById('lang-select');
+        langSelect.value = localStorage.getItem('clinic_lang') || 'en';
+        
+        function updateAdminUI() {
+            const lang = langSelect.value;
+            localStorage.setItem('clinic_lang', lang);
+            const t = translations[lang];
+            
+            document.getElementById('app-title').textContent = t.app_title;
+            document.getElementById('nav-back').innerHTML = '&larr; ' + (lang === 'en' ? 'Back to Chat' : (lang === 'hi' ? 'चैट पर वापस' : 'चॅटवर परत'));
+            document.getElementById('db-search').placeholder = t.search_placeholder;
+            document.getElementById('sidebar-title').textContent = t.records_title;
+            
+            document.getElementById('filter-dashboard').innerHTML = t.filter_dashboard;
+            document.getElementById('filter-patients').innerHTML = t.filter_patients;
+            document.getElementById('filter-appointments').innerHTML = t.filter_appointments;
+            document.getElementById('filter-doctors').innerHTML = t.filter_doctors;
+            document.getElementById('filter-calllogs').innerHTML = t.filter_calllogs;
+            
+            // Trigger a re-render of current view to update internal text
+            if(window.refreshView) window.refreshView();
+        }
+
+        langSelect.addEventListener('change', updateAdminUI);
+        updateAdminUI();
+    </script>
+</body>
+</html>

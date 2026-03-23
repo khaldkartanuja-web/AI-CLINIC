@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartClinic AI - Live Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --bg-light: #f1f5f9;
+            --bg-panel: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            background-image: radial-gradient(circle at top right, #eff6ff, transparent 40%),
+                              radial-gradient(circle at bottom left, #ecfdf5, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 1.25rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        select.niche-selector {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #d1fae5;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        select.niche-selector option {
+            background: white;
+            color: #1e293b;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #bbf7d0;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 2.5rem;
+            gap: 2.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Phone Mockup */
+        .phone-container {
+            flex: 0 0 400px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .phone {
+            width: 350px;
+            height: 720px;
+            background: #111827;
+            border-radius: 50px;
+            padding: 10px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 0 1px #334155;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border: 6px solid #1e293b;
+        }
+
+        .phone-screen {
+            background: #f8fafc;
+            flex: 1;
+            border-radius: 40px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .call-header {
+            background: #ffffff;
+            padding: 40px 20px 25px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .caller-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #eff6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 28px;
+            border: 2px solid var(--primary);
+        }
+
+        .chat-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        .msg {
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 85%;
+            font-size: 0.9375rem;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .msg.bot {
+            background: white;
+            color: #1e293b;
+            align-self: flex-start;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+        .input-box {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 24px;
+            padding: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .input-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 8px 15px;
+            color: #1e293b;
+            outline: none;
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+        }
+
+        .send-btn {
+            background: var(--primary);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            font-size: 1.25rem;
+        }
+        
+        .send-btn:hover { background: #1d4ed8; }
+
+        .mic-btn {
+            background: var(--accent);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            font-size: 18px;
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
+        .mic-btn:hover { background: #059669; }
+        .mic-btn.listening {
+            background: var(--danger);
+            animation: micPulse 1s infinite;
+        }
+        @keyframes micPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+        }
+
+        .voice-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .voice-toggle input[type=checkbox] {
+            accent-color: var(--primary);
+            width: 16px; height: 16px;
+        }
+
+        .end-call-btn {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .end-call-btn:hover { background: #fef2f2; border-color: var(--danger); }
+
+        /* Dashboard */
+        .dashboard {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .client-greeting h2 { font-size: 2.25rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; }
+        .client-greeting p { color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 1.75rem;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+            border-radius: 20px 0 0 20px;
+        }
+
+        .stat-value {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin: 4px 0;
+            color: #0f172a;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.25px;
+            font-weight: 700;
+        }
+
+        .panels-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.75rem;
+            flex: 1;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .panel h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-count {
+            background: #eff6ff;
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .list-container {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 8px;
+        }
+
+        .list-container::-webkit-scrollbar { width: 4px; }
+        .list-container::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+        .list-item {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #f1f5f9;
+            transition: all 0.2s;
+        }
+        
+        .list-item:hover {
+            transform: translateX(4px);
+            border-color: var(--primary-light);
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+
+        .item-title { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+        .item-time { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; }
+        .item-desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
+        
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .status-badge.Pending { background: #fef3c7; color: #92400e; }
+
+        /* Sync Loader */
+        .syncing {
+            position: absolute;
+            top: 20px; right: 20px;
+            color: var(--primary);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-weight: 700;
+        }
+        .syncing.active { opacity: 1; }
+        .spinner {
+            width: 14px; height: 14px;
+            border: 2px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-section">
+            <div class="logo">
+                🤖 AI Voice Receptionist
+            </div>
+            <select class="niche-selector" id="nicheSelector">
+                <option value="clinic">🏥 SmartClinic (Medical)</option>
+                <option value="dental">🦷 SmileCare (Dental)</option>
+                <option value="hvac">🔧 ProFix (HVAC/Plumbing)</option>
+            </select>
+        </div>
+        <div class="badge">Live Production Demo</div>
+    </header>
+
+    <div class="main-container">
+        <!-- Live Call Simulation -->
+        <div class="phone-container">
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="call-header">
+                        <div class="caller-avatar">🤖</div>
+                        <h3>AI Receptionist</h3>
+                        <p style="color:var(--text-muted); font-size: 0.8rem; margin-top:5px">+1 (800) SMART-DEMO</p>
+                    </div>
+                    
+                    <div class="chat-area" id="chatList"></div>
+
+                    <div class="input-area">
+                        <form id="chatForm">
+                            <div class="input-box">
+                                <button type="button" class="mic-btn" id="micBtn" title="Hold to speak">🎤</button>
+                                <input type="text" id="chatInput" placeholder="Type or tap 🎤 to speak..." autocomplete="off" required>
+                                <button type="submit" class="send-btn">➔</button>
+                            </div>
+                        </form>
+                        <div class="voice-toggle">
+                            <input type="checkbox" id="voiceToggle" checked>
+                            <label for="voiceToggle">🔊 AI speaks responses</label>
+                        </div>
+                        <button class="end-call-btn" id="endCallBtn">End Call (Generate Summary)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="dash-header">
+                <div class="client-greeting">
+                    <h2 id="dashTitle">Clinic Dashboard</h2>
+                    <p><span id="dashSubtitle">Demo Clinic HQ</span> • Real-time Data Sync</p>
+                </div>
+                <div class="syncing" id="syncIndicator">
+                    <div class="spinner"></div> Live Sync
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Calls Handled by AI</div>
+                    <div class="stat-value" id="valCalls">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Today's Appointments</div>
+                    <div class="stat-value" id="valAppts">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">AI Bookings</div>
+                    <div class="stat-value" id="valBookings">0</div>
+                </div>
+            </div>
+
+            <div class="panels-grid">
+                <div class="panel">
+                    <h3>Recent Call Summaries <span class="badge-count" id="countLogs">0</span></h3>
+                    <div class="list-container" id="callLogsList">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Today's Schedule <span class="badge-count" id="countAppts">0</span></h3>
+                    <div class="list-container" id="apptsList">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        const DEMO_PHONE = '18001112222';
+        
+        const chatList = document.getElementById('chatList');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const endCallBtn = document.getElementById('endCallBtn');
+        const syncIndicator = document.getElementById('syncIndicator');
+        const nicheSelector = document.getElementById('nicheSelector');
+        const micBtn = document.getElementById('micBtn');
+        const voiceToggle = document.getElementById('voiceToggle');
+        
+        const NICHES = {
+            clinic: { title: "SmartClinic", sub: "Medical Clinic HQ", greet: "Hello! Welcome to SmartClinic. Are you a new or existing patient?" },
+            dental: { title: "SmileCare Dental", sub: "Dental Clinic HQ", greet: "Hi, thanks for calling SmileCare Dental! Are you calling for a routine checkup or a dental emergency?" },
+            hvac: { title: "ProFix Plumbing & HVAC", sub: "Dispatch Dashboard", greet: "Hello, you've reached ProFix HVAC. How can we help you today? Do you need an urgent repair?" }
+        };
+
+        // ========= VOICE: Text-to-Speech =========
+        let cachedVoices = [];
+        function loadVoices() {
+            cachedVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+        }
+        if (window.speechSynthesis) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function speakText(text) {
+            if (!voiceToggle.checked) return;
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            // Clean emojis for speech
+            const clean = text
+                .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+                .replace(/[\u{2600}-\u{27BF}]/gu, '')
+                .replace(/[\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu, '')
+                .replace(/[✅❌✨⏰⏳📋📊📅💊💰🧾🏥🧑🔍📱🆔📞🎯👨‍⚕️💡⚠️]/g, '')
+                .replace(/\n/g, '. ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (!clean || clean.length < 2) return;
+            const utter = new SpeechSynthesisUtterance(clean);
+            utter.rate = 0.95;
+            utter.pitch = 1.0;
+            utter.volume = 1.0;
+            if (cachedVoices.length === 0) loadVoices();
+            const best = cachedVoices.find(v => v.name.includes('Google') && v.lang.startsWith('en'))
+                || cachedVoices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('en'))
+                || cachedVoices.find(v => v.lang.startsWith('en-'));
+            if (best) utter.voice = best;
+            window.speechSynthesis.speak(utter);
+        }
+
+        // ========= VOICE: Speech-to-Text (Microphone) =========
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+            recognition.lang = 'en-IN';
+
+            recognition.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('listening');
+                micBtn.innerText = '⏹';
+                chatInput.placeholder = '🎤 Listening... speak now';
+                chatInput.value = '';
+            };
+            recognition.onresult = (event) => {
+                let interim = '';
+                let final = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        final += event.results[i][0].transcript;
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
+                }
+                if (interim) chatInput.value = interim;
+                if (final) {
+                    chatInput.value = final;
+                    setTimeout(() => sendMessage(final), 300);
+                }
+            };
+            recognition.onend = () => {
+                isListening = false;
+                micBtn.classList.remove('listening');
+                micBtn.innerText = '🎤';
+                chatInput.placeholder = 'Type or tap 🎤 to speak...';
+            };
+            recognition.onerror = (event) => {
+                console.error('Speech error:', event.error);
+                isListening = false;
+                micBtn.classList.remove('listening');
+                micBtn.innerText = '🎤';
+                if (event.error === 'not-allowed') {
+                    alert('🎤 Microphone access denied. Please allow it in browser settings.');
+                } else if (event.error === 'no-speech') {
+                    chatInput.placeholder = 'No speech detected. Tap 🎤 again...';
+                } else {
+                    chatInput.placeholder = 'Voice error. Tap 🎤 to retry...';
+                }
+            };
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (!recognition) {
+                alert('🎤 Speech recognition requires Google Chrome. Please open this page in Chrome.');
+                return;
+            }
+            if (isListening) {
+                recognition.stop();
+            } else {
+                // Stop AI speech before listening so mic doesn't pick it up
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                try { recognition.start(); } catch(e) { console.error(e); }
+            }
+        });
+
+        // Handle Niche Change
+        nicheSelector.addEventListener('change', (e) => {
+            const niche = NICHES[e.target.value];
+            document.getElementById('dashTitle').innerText = niche.title + ' Dashboard';
+            document.getElementById('dashSubtitle').innerText = niche.sub;
+            chatList.innerHTML = '';
+            addChat(niche.greet, 'bot');
+            speakText(niche.greet);
+            refreshDashboard();
+        });
+
+        // Initial Greeting
+        addChat(NICHES.clinic.greet, 'bot');
+        setTimeout(() => speakText(NICHES.clinic.greet), 500);
+
+        // Send Message
+        async function sendMessage(text) {
+            if(!text) return;
+            addChat(text, 'user');
+            chatInput.value = '';
+            
+            triggerSync();
+            try {
+                const res = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ userMessage: text, phone: DEMO_PHONE })
+                });
+                const data = await res.json();
+                addChat(data.text, 'bot');
+                speakText(data.text); // AI speaks the response!
+                
+                // If it executed an action, refresh dashboard instantly
+                if(data.action_executed) {
+                    refreshDashboard();
+                }
+            } catch(err) {
+                addChat('Error connecting to backend.', 'bot');
+            }
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            await sendMessage(text);
+        });
+
+        // End Call -> Generate Summary
+        endCallBtn.addEventListener('click', async () => {
+            endCallBtn.disabled = true;
+            endCallBtn.innerText = 'Generating Summary...';
+            triggerSync();
+            
+            try {
+                await fetch(`${API_BASE}/chat/summary`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ phone: DEMO_PHONE, clinic_id: 1 })
+                });
+                chatList.innerHTML = '';
+                addChat('Call ended. The AI is ready for the next customer.', 'bot');
+                refreshDashboard();
+            } catch (err) {
+                console.error(err);
+            } finally {
+                endCallBtn.disabled = false;
+                endCallBtn.innerText = 'End Call (Generate Summary)';
+            }
+        });
+
+        function formatText(text) {
+            if (!text) return '';
+            let safe = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary);">$1</strong>');
+            safe = safe.replace(/^###\s+(.*)$/gm, '<h3 style="margin: 1rem 0 0.5rem 0; color: var(--accent); font-size: 1.1rem; border-bottom: 1px solid rgba(16,185,129,0.2); padding-bottom: 0.3rem;">$1</h3>');
+            safe = safe.replace(/^[-\•]\s+(.*)$/gm, '<li style="margin-left: 1.5rem; margin-bottom: 0.3rem;">$1</li>');
+            safe = safe.replace(/<\/h3>\n+/g, '</h3>');
+            return safe;
+        }
+
+        function addChat(text, sender) {
+            const div = document.createElement('div');
+            div.className = `msg ${sender}`;
+            if (sender === 'bot') {
+                div.innerHTML = formatText(text);
+            } else {
+                div.innerText = text;
+            }
+            chatList.appendChild(div);
+            chatList.scrollTop = chatList.scrollHeight;
+        }
+
+        function triggerSync() {
+            syncIndicator.classList.add('active');
+            setTimeout(() => syncIndicator.classList.remove('active'), 1500);
+        }
+
+        // Fetch Dashboard Data
+        async function refreshDashboard() {
+            try {
+                triggerSync();
+                // Fetch Call Logs
+                const logsRes = await fetch(`${API_BASE}/call-logs`);
+                const logs = await logsRes.json();
+                
+                // Fetch Appointments
+                const apptsRes = await fetch(`${API_BASE}/appointments`); // all appointments
+                const apptsData = await apptsRes.json();
+                
+                // Render Logs
+                document.getElementById('countLogs').innerText = logs.length;
+                document.getElementById('valCalls').innerText = logs.length;
+                
+                const logsHtml = logs.map(l => `
+                    <div class="list-item">
+                        <div class="item-row">
+                            <span class="item-title">${l.customer_phone}</span>
+                            <span class="status-badge ${l.booking_status === 'Booked' ? '' : 'Pending'}">${l.booking_status}</span>
+                        </div>
+                        <div class="item-desc">${l.summary}</div>
+                    </div>
+                `).join('');
+                document.getElementById('callLogsList').innerHTML = logsHtml || '<p style="color:#666; font-size:0.9rem;">No calls yet. Try the interactive demo!</p>';
+
+                // Render Appointments
+                // Find today's appts locally for demo
+                const today = new Date().toISOString().split('T')[0];
+                const todays = apptsData.filter(a => a.date === today);
+                
+                document.getElementById('countAppts').innerText = todays.length;
+                document.getElementById('valAppts').innerText = todays.length;
+                document.getElementById('valBookings').innerText = apptsData.length;
+
+                const apptsHtml = todays.map(a => `
+                    <div class="list-item">
+                        <div class="item-row">
+                            <span class="item-title">${a.patient_name || 'Patient'}</span>
+                            <span class="item-time">${a.time}</span>
+                        </div>
+                        <div class="item-desc">Dr. ${a.doctor_name || 'Assigned'} • ${a.service || 'Checkup'}</div>
+                    </div>
+                `).join('');
+                document.getElementById('apptsList').innerHTML = apptsHtml || '<p style="color:#666; font-size:0.9rem;">No appointments scheduled today.</p>';
+
+            } catch (err) {
+                console.error('Dash refresh failed', err);
+            }
+        }
+
+        // Initial load
+        refreshDashboard();
+        // Auto refresh every 10s
+        setInterval(refreshDashboard, 10000);
+
+    </script>
+</body>
+</html>
